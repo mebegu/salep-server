@@ -7,7 +7,7 @@ exports.canAccess = function(req,res,next){
   query = {_id: req.user._id};
   User.findOne(query, {canAccess: 1, activated: 1}, function (err, data) {
     var detail = "";
-    var succes = false;
+    var success = false;
     var status = 200;
     if(err){
       detail = "Internal DB error";

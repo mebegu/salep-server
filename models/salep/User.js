@@ -5,17 +5,17 @@ const mongoose = require('mongoose'),
 
 
 const qrQuestionAcess = new Schema({
-  submit: {type: Boolean},
-  mark: {type: Boolean}
+  submit: {type: Boolean, required: true, default: false},
+  mark: {type: Boolean, required: true, default: false}
 });
 
 const qrAcess = new Schema({
-  question: {type: qrQuestionAcess}
+  question: {type: qrQuestionAcess, required: true, default: qrQuestionAcess}
 })
 
 const access = new Schema({
-  admin: {type: Boolean},
-  qr: {type: qrAcess}
+  admin: {type: Boolean, default: false},
+  qr: {type: qrAcess, required: true, default: qrAcess}
 })
 
 const UserSchema = new Schema({
@@ -23,7 +23,7 @@ const UserSchema = new Schema({
         surname: {type: String, required: false},
         email: {type: String, required:true, unique: true},
         photo: {type: mongoose.SchemaTypes.ObjectId},
-        access: {type:access, required: true},
+        access: {type:access, required: true, default: access},
         activated: {type: Boolean, required: true, default:false},
         date: { type: Date, default: Date.now },
         hash: {type: String, required: true},

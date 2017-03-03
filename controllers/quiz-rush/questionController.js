@@ -13,7 +13,7 @@ exports.submit = function(req,res,next){
     const data = new Question(object);
     question.save(err => {
       var detail = "";
-      var succes = false;
+      var success = false;
       var status = 200;
       if(err){
         detail = "Internal DB error";
@@ -38,7 +38,7 @@ exports.get = function(req,res,next){
   query = { _id: req.params.qid};
   Question.findOne(query, function (err, data) {
     var detail = "";
-    var succes = false;
+    var success = false;
     var status = 200;
     if(err){
       detail = "Internal DB error";
@@ -64,7 +64,7 @@ exports.list = function(req,res,next){
 
   Question.find({}, function (err, data) {
     var detail = "";
-    var succes = false;
+    var success = false;
     var status = 200;
     if(err){
       detail = "Internal DB error";
@@ -88,12 +88,11 @@ exports.list = function(req,res,next){
 exports.mark = function(req,res,next){
   console.log("Mark Question Request Recevied");
   query = { _id: req.body._id};
-  upt   = { activated: req.body.activated,
-            access: req.body.access};
+  upt   = { status: req.body.status};
 
   Question.findOneAndUpdate(query, upt, {new: true}, function (err, data) {
     var detail = "";
-    var succes = false;
+    var success = false;
     var status = 200;
     if(err){
       detail = "Internal DB error";

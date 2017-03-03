@@ -6,7 +6,7 @@ exports.get = function(req,res,next){
   query= { _id: req.params.uid};
   User.findOne(query, {hash: 0, salt: 0}, function (err, data) {
     var detail = "";
-    var succes = false;
+    var success = false;
     var status = 200;
     if(err){
       detail = "Internal DB error";
@@ -32,7 +32,7 @@ exports.list = function(req,res,next){
 
     User.find({}, {hash: 0, salt: 0}, function (err, data) {
       var detail = "";
-      var succes = false;
+      var success = false;
       var status = 200;
       if(err){
         detail = "Internal DB error";
@@ -61,7 +61,7 @@ exports.updateAccess = function(req,res,next){
 
   User.findOneAndUpdate(query, upt, {new: true}, function (err, data) {
     var detail = "";
-    var succes = false;
+    var success = false;
     var status = 200;
     if(err){
       detail = "Internal DB error";

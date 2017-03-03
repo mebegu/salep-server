@@ -8,7 +8,7 @@ const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
 
 mongoose.Promise = global.Promise;
-const conn = mongoose.connect('mongodb://host:port/SalepDB');
+const conn = mongoose.connect('mongodb://172.20.122.77:27017/salepDB');
 
 
 app.use(bodyParser.json());
@@ -17,4 +17,4 @@ app.use(cors());
 router(app);
 
 
-app.listen(8000);
+app.listen(5567);

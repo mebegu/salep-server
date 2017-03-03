@@ -3,12 +3,17 @@ const jwt = require('express-jwt');
 
 exports.apply = function(req,res,next){
   console.log("User Application Received");
+  if(!req.body.name || !req.body.surname || !req.body.email
+    || !req.body.password || !req.body.applicationMessage){
+      console.log("success: false, detail: Bad Request");
+      return res.status(400).send({"success": false, "detail": "Bad Request", "data": null});
+  }
+
   const user = new User(req.body);
   user.setPassword(req.body.password);
-
   user.save(err => {
     var detail = "";
-    var succes = false;
+    var success = false;
     var status = 200;
     if(err){
       detail = "Internal DB error";
@@ -24,6 +29,7 @@ exports.apply = function(req,res,next){
     return res.status(status).send({"success":success, "detail": detail, "data": data});
 
   });
+
 }
 
 exports.login = function(req,res,next){
@@ -31,7 +37,7 @@ exports.login = function(req,res,next){
 
   User.findOne({email: req.body.email}).exec((err, data) => {
     var detail = "";
-    var succes = false;
+    var success = false;
     var status = 200;
     if(err){
       detail = "Internal DB error";
@@ -43,6 +49,7 @@ exports.login = function(req,res,next){
       detail = "Login Successfull";
       status = 200;
       success = true;
+      data = data.generateJwt();
     }
 
     console.log("success: "+success+", detail: "+detail);
