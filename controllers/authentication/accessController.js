@@ -30,7 +30,7 @@ exports.canAccess = function(req,res,next){
     }
 
     console.log("success: "+success+", detail: "+detail);
-    console.log(err);
+    if(err)console.log(err);
     return res.status(status).send({"success":success, "detail": detail, "data": data});
   });
 }
