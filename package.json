@@ -17,5 +17,9 @@
     "express-jwt": "^5.1.0",
     "jsonwebtoken": "^7.3.0",
     "mongoose": "^4.8.5"
+  },
+  "devDependencies": {
+    "eslint": "^3.17.0",
+    "eslint-config-google": "^0.7.1"
   }
 }

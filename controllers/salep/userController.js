@@ -1,4 +1,5 @@
 const User = require('./../../models/salep/User');
+const utility = require('./../other/utility.js');
 
 exports.get = function(req,res,next){
   console.log("Get-User request received");
@@ -19,18 +20,35 @@ exports.get = function(req,res,next){
       status = 200;
       success = true;
     }
-
-    console.log("success: "+success+", detail: "+detail);
+    return utility.repond(res, status, success, detail, data, err);
+    /*console.log("success: "+success+", detail: "+detail);
     if(err)console.log(err);
-    return res.status(status).send({"success":success, "detail": detail, "data": data});
+    return res.status(status).send({"success":success, "detail": detail, "data": data});*/
 
   });
 };
 
 exports.list = function(req,res,next){
     console.log("List-Users request received");
+    var options = {
+      skip:0, // Starting Row
+      limit:10, // Ending Row
+      sort:{
+        date: -1 //Sort by Date Added DESC
+      }}
+    var query = {}
+    if(req.query.start)
+      options.skip = req.query.start;
 
-    User.find({}, {hash: 0, salt: 0}, function (err, data) {
+    if(req.query.end)
+      options.limit = req.query.end;
+
+    if((options.limit-options.skip)<0 || (options.limit-options.skip)>30){
+      return utility.repond(res, 400, false, "Bad Request", null, null);
+      //console.log("success: false, detail: Bad Request");
+      //return res.status(400).send({"success": false, "detail": "Bad Request", "data": null});
+    }
+    User.find(req.query, {hash: 0, salt: 0}, options function (err, data) {
       var detail = "";
       var success = false;
       var status = 200;
@@ -45,10 +63,10 @@ exports.list = function(req,res,next){
         status = 200;
         success = true;
       }
-
-      console.log("success: "+success+", detail: "+detail);
+      return utility.repond(res, status, success, detail, data, err);
+      /*console.log("success: "+success+", detail: "+detail);
       if(err)console.log(err);
-      return res.status(status).send({"success":success, "detail": detail, "data": data});
+      return res.status(status).send({"success":success, "detail": detail, "data": data});*/
 
     });
 }
@@ -74,10 +92,10 @@ exports.updateAccess = function(req,res,next){
       status = 200;
       success = true;
     }
-
-    console.log("success: "+success+", detail: "+detail);
+    return utility.repond(res, status, success, detail, data, err);
+    /*console.log("success: "+success+", detail: "+detail);
     if(err)console.log(err);
-    return res.status(status).send({"success":success, "detail": detail, "data": data});
+    return res.status(status).send({"success":success, "detail": detail, "data": data});*/
   });
 
 };
