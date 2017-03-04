@@ -11,7 +11,7 @@ const cookieParser = require('cookie-parser');
 
 
 app.use(bodyParser.json());
-apdsdp.use(cookieParser());
+app.use(cookieParser());
 app.use(cors());
 router(app);
 

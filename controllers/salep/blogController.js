@@ -1,105 +1,84 @@
 const Blog = require('./../../models/salep/Blog');
 const utility = require('./../other/utility.js');
+const isEmpty = utility.isEmpty;
+const respond = utility.respond;
+const respondQuery = utility.respondQuery;
+const repondBadRequest = utility.repondBadRequest;
 
-exports.create = function(req,res,next){
+exports.create = function (req, res, next) {
   console.log("Create Blog Request Received");
 
-  var object = {
-    title: req.body.title,
-    content: req.body.content,
-    author: req.user._id,
-    image: req.body.image,
-    tags: req.body.tags,
-    isPublished: req.body.isPublished;
+  let object = {
+    title:    req.body.title,
+    content:  req.body.content,
+    image:    req.body.image,
+    tags:     req.body.tags,
+    author:   req.user._id
   };
+
+  if (isEmpty(object.title)|| isEmpty(content) )
+    return repondBadRequest(res);
+
   const data = new Blog(object);
-  data.save(err => {
-    var detail = "";
-    var success = false;
-    var status = 200;
-    if(err){
-      detail = "Internal DB error";
-      status = 500;
-    }else{
-      detail = "Blog Submitted";
-      status = 200;
-      success = true;
-    }
-    return utility.repond(res, status, success, detail, data, err);
-    /*console.log("success: "+success+", detail: "+detail);
-    if(err)console.log(err);
-    return res.status(status).send({"success":success, "detail": detail, "data": data});*/
-
+  data.save((err) => {
+    return respondQuery(res, err, data, 'Blog', 'Submitted');
   });
 };
 
-exports.get = function(req,res,next){
+exports.get = function (req, res, next) {
   console.log("Get-Blog request received");
+  let query = { _id: req.params.bid };
 
-  query = { _id: req.params.bid};
-  Blog.findOne(query, function (err, data) {
-    var detail = "";
-    var success = false;
-    var status = 200;
-    if(err){
-      detail = "Internal DB error";
-      status = 500;
-    }else if(!data){
-      detail = "Blog Not Found";
-      status = 404;
-    }else{
-      detail = "Blog Found";
-      status = 200;
-      success = true;
-    }
-    return utility.repond(res, status, success, detail, data, err);
-    /*console.log("success: "+success+", detail: "+detail);
-    if(err)console.log(err);
-    return res.status(status).send({"success":success, "detail": detail, "data": data});*/
-
+  if(isEmpty(query._id)) 
+    return respondBadRequest(res);
+  
+  Blog.findById(query, function (err, data) {
+    return repondQuery(res, err, data, 'Blog', 'Found');
   });
 };
 
-exports.list = function(req,res,next){
-  console.log("List-Questions request received");
-  var options = {
-    skip:0, // Starting Row
-    limit:10, // Ending Row
-    sort:{
-      date: -1 //Sort by Date Added DESC
-    }}
-  var query = {}
-  if(req.query.start)
-    options.skip = req.query.start;
+exports.list = function (req, res, next) {
+  console.log("List-Blogs request received");
+  let options = utility.parseQueryOptions(req);
 
-  if(req.query.end)
-    options.limit = req.query.end;
+  if (options.skip < 0 || options.limit > 30)
+    return utility.repondBadRequest(res);
 
-  if((options.limit-options.skip)<0 || (options.limit-options.skip)>30){
-    return utility.repond(res, 400, false, "Bad Request", null, null);
-    //console.log("success: false, detail: Bad Request");
-    //return res.status(400).send({"success": false, "detail": "Bad Request", "data": null});
-  }
   Blog.find(req.query, options, function (err, data) {
-    var detail = "";
-    var success = false;
-    var status = 200;
-    if(err){
-      detail = "Internal DB error";
-      status = 500;
-    }else if(!data){
-      detail = "Blogs Not Found";
-      status = 404;
-    }else{
-      detail = "Blogs Found";
-      status = 200;
-      success = true;
-    }
+    return repondQuery(res, err, data, 'Blogs','Found');
+  });
+};
 
-    return utility.repond(res, status, success, detail, data, err);
-    /*console.log("success: "+success+", detail: "+detail);
-    if(err)console.log(err);
-    return res.status(status).send({"success":success, "detail": detail, "data": data});*/
+exports.edit = function (req, res, next) {
+  console.log("Edit Blog Request Recevied");
+  let query = {_id: req.body._id};
+  let object = {
+    title:      req.body.title,
+    content:    req.body.content,
+    image:      req.body.image,
+    tags:       req.body.tags,
+    date:       Date.now,
+    published:  req.body.published,
+    author:     req.user._id
+  };
 
+  if (isEmpty(query._id)|| isEmpty(email)) 
+    return repondBadRequest(res);
+  
+  Blog.findByIdAndUpdate(query, upt, {new: true}, 
+  function (err, data) {
+    return respondQuery(res, err, data, 'Blog', 'Blog');
+  });
+};
+
+exports.remove = function (req, res, next) {
+  console.log('Remove Blog request received');
+  query = {_id: req.params.qid};
+
+  if (isEmpty(query.id))
+    return repondBadRequest(res);
+
+  Blog.findByIdAndRemove(query, function (err, data) {
+    return repondQuery(res, err, data, 'Question', 'Removed');
   });
 };

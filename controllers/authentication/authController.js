@@ -1,75 +1,39 @@
 const User = require('./../../models/salep/User');
 const utility = require('./../other/utility.js');
 const jwt = require('express-jwt');
+const isEmpty = utility.isEmpty;
+const respond = utility.respond;
 
-exports.apply = function(req, res, next) {
-  console.log('User Application Received');
-
-  if(!req.body.username || !req.body.email
-    || !req.body.password) {
-      return utility.repond(res, 400, false, 'Bad Request', null, null);
-      /*
-        console.log('success: false, detail: Bad Request');
-        return res.status(400)
-                  .send({'success': false, 'detail': 'Bad Request', 'data': null});
-      */
-  }
-
-  const data = new User(req.body);
-  data.setPassword(req.body.password);
-  data.save((err) => {
-    let detail = '';
-    let success = false;
-    let status = 200;
-    if(err) {
-      detail = 'Internal DB error';
-      status = 500;
-    }else{
-      detail = 'New User Applied';
-      status = 200;
-      success = true;
-    }
-    return utility.repond(res, status, success, detail, data, err);
-    /*
-    console.log('success: '+success+', detail: '+detail);
-    if(err)console.log(err);
-    return res.status(status)
-              .send({'success':success, 'detail': detail, 'data': data});
-    */
-  });
-};
-
-exports.login = function(req, res, next) {
+exports.login = function (req, res, next) {
   console.log('Login Request Received');
+  let username = req.body.username;
+  let password = req.body.password;
 
-  User.findOne({username: req.body.username}).exec((err, data) => {
+  if (isEmpty(username) || isEmpty(password))
+    return utility.repondBadRequest(res);
+
+  User.findOne({'username': username}).exec((err, user) => {
     let detail = '';
     let success = false;
     let status = 200;
-    if(err) {
+    let data = null;
+    if (err) {
       detail = 'Internal DB error';
       status = 500;
-    }if(!data || !data.validPassword(req.body.password)){
+    }else if (!user || !user.validPassword(password)) {
       detail = 'Login Failed';
       status = 401;
-    }else{
+    } else {
       detail = 'Login Successfull';
       status = 200;
       success = true;
-      data = data.generateJwt();
+      data = user.generateJwt();
     }
-    return utility.repond(res, status, success, detail, data, err);
-    /*
-    console.log('success: '+success+', detail: '+detail);
-    if(err)console.log(err);
-    return res.status(status)
-              .send({'success':success, 'detail': detail, 'data': data});
-    */
+    return repond(res, status, success, detail, data, err);
   });
 };
 
-
 exports.auth = jwt({
   secret: process.env.MY_TOKEN || 'MY_TOKEN',
-  userProperty: 'user',
+  userProperty: 'user'
 });

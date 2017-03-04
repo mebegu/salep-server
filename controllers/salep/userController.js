@@ -1,101 +1,86 @@
 const User = require('./../../models/salep/User');
 const utility = require('./../other/utility.js');
 
-exports.get = function(req,res,next){
-  console.log("Get-User request received");
+exports.apply = function (req, res, next) {
+  console.log('User Application Received');
 
-  query= { _id: req.params.uid};
-  User.findOne(query, {hash: 0, salt: 0}, function (err, data) {
-    var detail = "";
-    var success = false;
-    var status = 200;
-    if(err){
-      detail = "Internal DB error";
-      status = 500;
-    }else if(!data){
-      detail = "User Not Found";
-      status = 404;
-    }else{
-      detail = "User Found";
-      status = 200;
-      success = true;
-    }
-    return utility.repond(res, status, success, detail, data, err);
-    /*console.log("success: "+success+", detail: "+detail);
-    if(err)console.log(err);
-    return res.status(status).send({"success":success, "detail": detail, "data": data});*/
+  let object = {
+    username: req.body.username ,
+    name: req.body.name,
+    surname: req.body.surname,
+    email: req.body.email,
+    photo: req.body.photo,
+    message: req.body.message
+  };
+  let password = req.body.password;
+  if (!object.username || !object.email || !password)
+    return utility.repondBadRequest(res);
 
+  const data = new User(object);
+  data.setPassword(req.body.password);
+  data.save((err) => {
+    return utility.respondQuery(res, err, data, 'New User', 'Applied');
   });
 };
 
-exports.list = function(req,res,next){
-    console.log("List-Users request received");
-    var options = {
-      skip:0, // Starting Row
-      limit:10, // Ending Row
-      sort:{
-        date: -1 //Sort by Date Added DESC
-      }}
-    var query = {}
-    if(req.query.start)
-      options.skip = req.query.start;
+exports.get = function (req, res, next) {
+  console.log('Get-User request received');
+  query = {_id: req.params.qid};
 
-    if(req.query.end)
-      options.limit = req.query.end;
+  if (!query._id)
+    return utility.repondBadRequest(res);
 
-    if((options.limit-options.skip)<0 || (options.limit-options.skip)>30){
-      return utility.repond(res, 400, false, "Bad Request", null, null);
-      //console.log("success: false, detail: Bad Request");
-      //return res.status(400).send({"success": false, "detail": "Bad Request", "data": null});
-    }
-    User.find(req.query, {hash: 0, salt: 0}, options function (err, data) {
-      var detail = "";
-      var success = false;
-      var status = 200;
-      if(err){
-        detail = "Internal DB error";
-        status = 500;
-      }else if(!data){
-        detail = "Users Not Found";
-        status = 404;
-      }else{
-        detail = "Users Found";
-        status = 200;
-        success = true;
-      }
-      return utility.repond(res, status, success, detail, data, err);
-      /*console.log("success: "+success+", detail: "+detail);
-      if(err)console.log(err);
-      return res.status(status).send({"success":success, "detail": detail, "data": data});*/
+  User.findById(query, function (err, data) {
+    return utility.repondQuery(res, err, data, 'User', 'Found');
+  });
+};
 
-    });
+
+exports.list = function (req, res, next) {
+  console.log("List-User request received");
+  let options = utility.parseQueryOptions(req);
+
+  if (options.skip < 0 || options.limit > 30)
+    return utility.repondBadRequest(res);
+
+  User.find(req.query, options, function (err, data) {
+    return utility.repondQuery(res, err, data, 'Users','Found');
+  });
 }
 
-exports.updateAccess = function(req,res,next){
+exports.updateAccess = function (req, res, next) {
   console.log("Update Access Request Recevied");
-  query = { _id: req.body._id};
-  upt   = { activated: req.body.activated,
-            access: req.body.access};
+  query = {_id: req.body._id};
+  upt = {
+    activated:  req.body.activated,
+    access:     req.body.access
+  };
 
-  User.findOneAndUpdate(query, upt, {new: true}, function (err, data) {
-    var detail = "";
-    var success = false;
-    var status = 200;
-    if(err){
-      detail = "Internal DB error";
-      status = 500;
-    }else if(!data){
-      detail = "User Not Found";
-      status = 404;
-    }else{
-      detail = "Access Control Updated";
-      status = 200;
-      success = true;
-    }
-    return utility.repond(res, status, success, detail, data, err);
-    /*console.log("success: "+success+", detail: "+detail);
-    if(err)console.log(err);
-    return res.status(status).send({"success":success, "detail": detail, "data": data});*/
+  if (!query._id || !upt.activated || !upt.access) 
+    return utility.repondBadRequest(res);
+  
+  User.findByIdAndUpdate(query, upt, {new: true}, 
+  function (err, data) {
+    return utility.respondQuery(res, err, data, 'Question', 'Marked');
   });
+};
 
+exports.edit = function (req, res, next) {
+  console.log("Edit User Request Recevied");
+  let query = {_id: req.body._id};
+  let upt = {
+    name: req.body.name,
+    surname: req.body.surname,
+    email: req.body.email,
+    photo: req.body.photo,
+    message: req.body.message
+  };
+
+  if (!query._id || !upt.email || upt.isEmpty()) 
+    return utility.repondBadRequest(res);
+  
+  User.findByIdAndUpdate(query, upt, {new: true}, 
+  function (err, data) {
+    return utility.respondQuery(res, err, data, 'Question', 'Marked');
+  });
 };

@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 const crypto = require('crypto');
-  const jsonwebtoken = require('jsonwebtoken');
- const Schema = mongoose.Schema;
+const jsonwebtoken = require('jsonwebtoken');
+const Schema = mongoose.Schema;
 
 
 const qrQuestionAcess = new Schema({
   submit: {type: Boolean, required: true, default: false},
-  mark: {type: Boolean, required: true, default: false},
+  mark:   {type: Boolean, required: true, default: false},
 });
 
 const qrAcess = new Schema({
@@ -15,21 +15,21 @@ const qrAcess = new Schema({
 
 const access = new Schema({
   admin: {type: Boolean, default: false},
-  qr: {type: qrAcess, required: true, default: qrAcess},
+  qr:    {type: qrAcess, required: true, default: qrAcess},
 });
 
 const UserSchema = new Schema({
-      username: {type: String, required: true, unique: true},
-      name: {type: String, required: false},
-      surname: {type: String, required: false},
-      email: {type: String, required: true, unique: true},
-      photo: {type: String},
-      access: {type: access, default: access},
-      activated: {type: Boolean, default: false},
-      date: {type: Date, default: Date.now},
-      hash: {type: String},
-      salt: {type: String},
-      applicationMessage: {type: String},
+  username:  {type: String , required: true, unique: true},
+  name:      {type: String , required: false},
+  surname:   {type: String , required: false},
+  email:     {type: String , required: true, unique: true},
+  photo:     {type: String},
+  access:    {type: access , default: access},
+  activated: {type: Boolean, default: false},
+  date:      {type: Date   , default: Date.now},
+  hash:      {type: String},
+  salt:      {type: String},
+  message:   {type: String},
 });
 
 
@@ -49,10 +49,10 @@ UserSchema.methods.generateJwt = function() {
   const expiry = new Date();
   expiry.setDate(expiry.getDate() + 15);
   return jsonwebtoken.sign({
-    _id: this._id,
-    email: this.email,
+    _id:      this._id,
+    email:    this.email,
     username: this.username,
-    expire: parseInt(expiry.getTime() / 1000),
+    expire:   parseInt(expiry.getTime() / 1000)
   }, process.env.MY_TOKEN || 'MY_TOKEN');
 };
 
