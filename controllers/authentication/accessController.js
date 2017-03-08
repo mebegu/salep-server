@@ -1,14 +1,18 @@
 const User = require('./../../models/salep/User');
+const Role = require('./../../models/salep/Role');
 const utility = require('./../other/utility.js');
 const respond = utility.respond;
 
+
 exports.canAccess = function (req, res, next) {
   let path = req.path;
+  let roles = req.user.roles;
   console.log(path);
   
   let query = {_id: req.user._id};
   let select = {
-    canAccess: 1,
+    _id: 1,
+    roles: 1,
     activated: 1
   };
   User.findOne(query, select, function (err, data) {
@@ -27,7 +31,7 @@ exports.canAccess = function (req, res, next) {
       detail = 'User is not activated';
       status = 401;
     } else {
-      if (control(path, doc)) {
+      if (control(roles, path, doc)) {
         return next();
       } else {
         detail = 'Unauthorized';
@@ -35,21 +39,22 @@ exports.canAccess = function (req, res, next) {
       }
     }
 
-    return repond(res, status, success, detail, data, err);
+    return respond(res, status, success, detail, data, err);
   });
 };
 
-function control(path, doc) {
-  switch (path) {
-    case '/question/submit':
-      if (doc.access.question.submit)
-        return true;
-      break;
-    case '/question/mark':
-      if (doc.access.question.mark)
-        return true;
-      break;
-    default:
+function control(roles, path, doc) {
+  Role.find({accesible: path}).exec(function(err, data){
+    if (err) {
       return false;
-  }
+    } else if (!data) {
+      return false;
+    } else {
+      data.forEach(function(label){
+        if(roles.indexOf(label) != -1)
+          return true;
+      });
+      return false;
+    }
+  })
 }

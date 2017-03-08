@@ -6,9 +6,8 @@ const router = require('./router');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 
-// mongoose.Promise = global.Promise;
-// const conn = mongoose.connect('mongodb://172.20.122.77:27017/salepDB');
-
+mongoose.Promise = global.Promise;
+const conn = mongoose.connect('mongodb://172.20.55.161:27017/salepDB');
 
 app.use(bodyParser.json());
 app.use(cookieParser());

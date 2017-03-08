@@ -36,7 +36,7 @@ exports.respondQuery = function (res, err, data, obj, sMsg) {
 
 exports.respondBadRequest = function (res) {
   console.log('success: ' + false + ', detail: Bad Request');
-  return res.status(status)
+  return res.status(400)
     .send({
       'success': false,
       'detail': 'Bad Request',

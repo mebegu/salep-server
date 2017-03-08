@@ -10,7 +10,7 @@ exports.login = function (req, res, next) {
   let password = req.body.password;
 
   if (isEmpty(username) || isEmpty(password))
-    return utility.repondBadRequest(res);
+    return utility.respondBadRequest(res);
 
   User.findOne({'username': username}).exec((err, user) => {
     let detail = '';
@@ -23,13 +23,16 @@ exports.login = function (req, res, next) {
     }else if (!user || !user.validPassword(password)) {
       detail = 'Login Failed';
       status = 401;
+    } else if(!user.activated){
+      detail = 'User Not Activated';
+      status = 401;
     } else {
       detail = 'Login Successfull';
       status = 200;
       success = true;
       data = user.generateJwt();
     }
-    return repond(res, status, success, detail, data, err);
+    return respond(res, status, success, detail, data, err);
   });
 };
 

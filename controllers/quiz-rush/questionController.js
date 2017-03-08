@@ -3,7 +3,8 @@ const utility = require('./../other/utility.js');
 const isEmpty = utility.isEmpty;
 const respond = utility.respond;
 const respondQuery = utility.respondQuery;
-const repondBadRequest = utility.repondBadRequest;
+const respondBadRequest = utility.respondBadRequest;
+const parseQueryOptions = utility.parseQueryOptions;
 
 exports.submit = function (req, res, next) {
   console.log('Question Submission Received');
@@ -19,7 +20,7 @@ exports.submit = function (req, res, next) {
 
   if (isEmpty(question) || isEmpty(options) ||
     object.options.length != 4 || object.correctAnswer < 0 || object.correctAnswer > 3)
-    return utility.repondBadRequest(res);
+    return utility.respondBadRequest(res);
 
   const data = new Question(object);
   data.save((err) => {
@@ -32,10 +33,10 @@ exports.get = function (req, res, next) {
   query = {_id: req.params.qid};
 
   if (isEmpty(query.id))
-    return repondBadRequest(res);
+    return respondBadRequest(res);
 
-  Question.findById(query, function (err, data) {
-    return repondQuery(res, err, data, 'Question', 'Found');
+  Question.findById(query).populate("author", "username").exec( function (err, data) {
+    return respondQuery(res, err, data, 'Question', 'Found');
   });
 };
 
@@ -44,10 +45,10 @@ exports.list = function (req, res, next) {
   let options = utility.parseQueryOptions(req);
 
   if (options.skip < 0 || options.limit > 30)
-    return repondBadRequest(res);
+    return respondBadRequest(res);
 
-  Question.find(req.query, options, function (err, data) {
-    return repondQuery(res, err, data, 'Questions', 'Found');
+  Question.find(req.query, {question:1, status:1, author:1, date:1}, options).populate("author", "username").exec( function (err, data) {
+    return respondQuery(res, err, data, 'Questions', 'Found');
   });
 };
 
@@ -57,7 +58,7 @@ exports.mark = function (req, res, next) {
   upt = {status: req.body.status};
 
   if (isEmpty(query._id) || isEmpty(upt.status))
-    return repondBadRequest(res);
+    return respondBadRequest(res);
 
   Question.findByIdAndUpdate(query, upt, {
       new: true
@@ -79,11 +80,11 @@ exports.edit = function (req, res, next) {
   };
 
   if (isEmpty(query._id)|| isEmpty(email)) 
-    return utility.repondBadRequest(res);
+    return respondBadRequest(res);
   
   Question.findByIdAndUpdate(query, upt, {new: true}, 
   function (err, data) {
-    return utility.respondQuery(res, err, data, 'Question', 'Edited');
+    return respondQuery(res, err, data, 'Question', 'Edited');
   });
 };
 
@@ -92,9 +93,9 @@ exports.remove = function (req, res, next) {
   query = {_id: req.params.qid};
 
   if (isEmpty(query.id))
-    return repondBadRequest(res);
+    return respondBadRequest(res);
 
   Question.findByIdAndRemove(query, function (err, data) {
-    return repondQuery(res, err, data, 'Question', 'Remove');
+    return respondQuery(res, err, data, 'Question', 'Remove');
   });
 };

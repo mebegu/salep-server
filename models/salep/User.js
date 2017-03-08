@@ -4,27 +4,13 @@ const jsonwebtoken = require('jsonwebtoken');
 const Schema = mongoose.Schema;
 
 
-const qrQuestionAcess = new Schema({
-  submit: {type: Boolean, required: true, default: false},
-  mark:   {type: Boolean, required: true, default: false},
-});
-
-const qrAcess = new Schema({
-  question: {type: qrQuestionAcess, required: true, default: qrQuestionAcess},
-});
-
-const access = new Schema({
-  admin: {type: Boolean, default: false},
-  qr:    {type: qrAcess, required: true, default: qrAcess},
-});
-
 const UserSchema = new Schema({
   username:  {type: String , required: true, unique: true},
   name:      {type: String , required: false},
   surname:   {type: String , required: false},
   email:     {type: String , required: true, unique: true},
   photo:     {type: String},
-  access:    {type: access , default: access},
+  roles:     {type: [String]},
   activated: {type: Boolean, default: false},
   date:      {type: Date   , default: Date.now},
   hash:      {type: String},
@@ -52,6 +38,7 @@ UserSchema.methods.generateJwt = function() {
     _id:      this._id,
     email:    this.email,
     username: this.username,
+    roles:    this.roles,
     expire:   parseInt(expiry.getTime() / 1000)
   }, process.env.MY_TOKEN || 'MY_TOKEN');
 };

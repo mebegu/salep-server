@@ -1,9 +1,15 @@
 const User = require('./../../models/salep/User');
 const utility = require('./../other/utility.js');
+const parseQueryOptions = utility.parseQueryOptions;
+const isEmpty = utility.isEmpty;
+const respond = utility.respond;
+const respondQuery = utility.respondQuery;
+const respondBadRequest = utility.respondBadRequest;
+
 
 exports.apply = function (req, res, next) {
   console.log('User Application Received');
-
+  console.log(req.body);
   let object = {
     username: req.body.username ,
     name: req.body.name,
@@ -14,37 +20,37 @@ exports.apply = function (req, res, next) {
   };
   let password = req.body.password;
   if (!object.username || !object.email || !password)
-    return utility.repondBadRequest(res);
+    return respondBadRequest(res);
 
   const data = new User(object);
   data.setPassword(req.body.password);
   data.save((err) => {
-    return utility.respondQuery(res, err, data, 'New User', 'Applied');
+    return respondQuery(res, err, data._id, 'New User', 'Applied');
   });
 };
 
 exports.get = function (req, res, next) {
   console.log('Get-User request received');
-  query = {_id: req.params.qid};
+  query = {_id: req.params.uid};
 
   if (!query._id)
-    return utility.repondBadRequest(res);
+    return respondBadRequest(res);
 
-  User.findById(query, function (err, data) {
-    return utility.repondQuery(res, err, data, 'User', 'Found');
+  User.findById(query,{hash:0, salt:0}, function (err, data) {
+    return respondQuery(res, err, data, 'User', 'Found');
   });
 };
 
 
 exports.list = function (req, res, next) {
   console.log("List-User request received");
-  let options = utility.parseQueryOptions(req);
+  let options = parseQueryOptions(req);
 
   if (options.skip < 0 || options.limit > 30)
-    return utility.repondBadRequest(res);
+    return respondBadRequest(res);
 
-  User.find(req.query, options, function (err, data) {
-    return utility.repondQuery(res, err, data, 'Users','Found');
+  User.find(req.query, {_id:1, username:1, name:1, surname:1}, options, function (err, data) {
+    return respondQuery(res, err, data, 'Users','Found');
   });
 }
 
@@ -57,11 +63,11 @@ exports.updateAccess = function (req, res, next) {
   };
 
   if (!query._id || !upt.activated || !upt.access) 
-    return utility.repondBadRequest(res);
+    return respondBadRequest(res);
   
   User.findByIdAndUpdate(query, upt, {new: true}, 
   function (err, data) {
-    return utility.respondQuery(res, err, data, 'Question', 'Marked');
+    return respondQuery(res, err, data, 'Question', 'Marked');
   });
 };
 
@@ -77,10 +83,10 @@ exports.edit = function (req, res, next) {
   };
 
   if (!query._id || !upt.email || upt.isEmpty()) 
-    return utility.repondBadRequest(res);
+    return respondBadRequest(res);
   
   User.findByIdAndUpdate(query, upt, {new: true}, 
   function (err, data) {
-    return utility.respondQuery(res, err, data, 'Question', 'Marked');
+    return respondQuery(res, err, data, 'Question', 'Marked');
   });
 };
