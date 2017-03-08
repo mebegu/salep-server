@@ -15,7 +15,7 @@ module.exports = function(app) {
   // User
   salepRoutes.post('/user/apply', user.apply);
   salepRoutes.post('/user/edit', cont, user.edit); // TODO owner check
-  salepRoutes.post('/user/updateAccess', cont, user.updateAccess);
+  salepRoutes.post('/user/activate', cont, user.activate);
   salepRoutes.get('/user/:uid',  auth.auth, user.get);
   salepRoutes.get('/user',       auth.auth, user.list);
   // TODO change password

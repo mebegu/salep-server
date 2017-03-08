@@ -54,20 +54,17 @@ exports.list = function (req, res, next) {
   });
 }
 
-exports.updateAccess = function (req, res, next) {
-  console.log("Update Access Request Recevied");
+exports.activate = function (req, res, next) {
+  console.log("Update Activation Request Recevied");
   query = {_id: req.body._id};
-  upt = {
-    activated:  req.body.activated,
-    access:     req.body.access
-  };
+  upt = {activated:  req.body.activated};
 
-  if (!query._id || !upt.activated || !upt.access) 
+  if (!query._id || !upt.activated) 
     return respondBadRequest(res);
   
   User.findByIdAndUpdate(query, upt, {new: true}, 
   function (err, data) {
-    return respondQuery(res, err, data, 'Question', 'Marked');
+    return respondQuery(res, err, data, 'User', 'Activation');
   });
 };
 
