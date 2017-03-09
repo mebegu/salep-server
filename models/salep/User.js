@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
-const crypto = require('crypto');
+const bcrypt = require('bcrypt');
 const jsonwebtoken = require('jsonwebtoken');
+const config = require('./../../config.json');
 const Schema = mongoose.Schema;
 
 
@@ -9,38 +10,37 @@ const UserSchema = new Schema({
   name:      {type: String , required: false},
   surname:   {type: String , required: false},
   email:     {type: String , required: true, unique: true},
-  photo:     {type: String},
-  roles:     {type: [String]},
-  activated: {type: Boolean, default: false},
+  roles:     {type: [String],required: true, default: []},
+  admin:     {type: Boolean, required: true, default: false},
+  activated: {type: Boolean, required: true, default: false},
   date:      {type: Date   , default: Date.now},
+  photo:     {type: String},
   hash:      {type: String},
-  salt:      {type: String},
-  message:   {type: String},
+  message:   {type: String}
 });
 
 
 UserSchema.methods.setPassword = function(password) {
-  this.salt = crypto.randomBytes(16).toString('hex');
-  this.hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64, 'sha1')
-                    .toString('hex');
+  bcrypt.hash(password, config.saltRounds, function(err, hash) {
+    this.hash = hash;
+  });
 };
 
 UserSchema.methods.validPassword = function(password) {
-  const hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64, 'sha1')
-                     .toString('hex');
-  return this.hash === hash;
+  bcrypt.compare(password, this.hash, function(err, res) {
+    return res;
+  });
 };
 
 UserSchema.methods.generateJwt = function() {
-  const expiry = new Date();
-  expiry.setDate(expiry.getDate() + 15);
   return jsonwebtoken.sign({
     _id:      this._id,
     email:    this.email,
     username: this.username,
-    roles:    this.roles,
-    expire:   parseInt(expiry.getTime() / 1000)
-  }, process.env.MY_TOKEN || 'MY_TOKEN');
+    activated:this.activated,
+    admin:    this.admin,
+    roles:    this.roles
+  }, (process.env.MY_TOKEN || config.JWTSecret), { expiresInMinutes: config.JWTExpiration });
 };
 
 

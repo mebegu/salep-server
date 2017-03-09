@@ -36,7 +36,7 @@ exports.get = function (req, res, next) {
   if (!query._id)
     return respondBadRequest(res);
 
-  User.findById(query,{hash:0, salt:0}, function (err, data) {
+  User.findById(query,{hash:0}, function (err, data) {
     return respondQuery(res, err, data, 'User', 'Found');
   });
 };
@@ -64,7 +64,7 @@ exports.activate = function (req, res, next) {
   
   User.findByIdAndUpdate(query, upt, {new: true}, 
   function (err, data) {
-    return respondQuery(res, err, data, 'User', 'Activation');
+    return respondQuery(res, err, data._id, 'User', 'Activation');
   });
 };
 
@@ -84,6 +84,6 @@ exports.edit = function (req, res, next) {
   
   User.findByIdAndUpdate(query, upt, {new: true}, 
   function (err, data) {
-    return respondQuery(res, err, data, 'Question', 'Marked');
+    return respondQuery(res, err, data._id, 'Question', 'Marked');
   });
 };

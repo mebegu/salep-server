@@ -11,13 +11,14 @@ module.exports = function(app) {
   const salepRoutes = express.Router();
   const cont = [auth.auth, access.canAccess];
 
+  // TODO centralize embedded strings
   /*-------SALEP ROUTES------------*/
   // User
   salepRoutes.post('/user/apply', user.apply);
   salepRoutes.post('/user/edit', cont, user.edit); // TODO owner check
   salepRoutes.post('/user/activate', cont, user.activate);
   salepRoutes.get('/user/:uid',  auth.auth, user.get);
-  salepRoutes.get('/user',       auth.auth, user.list);
+  salepRoutes.get('/user',        user.list);
   // TODO change password
 
   // Blog
@@ -39,6 +40,7 @@ module.exports = function(app) {
 
   // Other
   salepRoutes.post('/login', auth.login);
+  salepRoutes.post('/refreshToken', auth.auth, auth.refresh);
 
   /*-------QUIZ RUSH ROUTES------------*/
   //Question

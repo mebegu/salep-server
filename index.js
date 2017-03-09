@@ -5,9 +5,10 @@ const bodyParser = require('body-parser');
 const router = require('./router');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const config = require('./config.json');
 
 mongoose.Promise = global.Promise;
-const conn = mongoose.connect('mongodb://172.20.55.161:27017/salepDB');
+const conn = mongoose.connect(config.db);
 
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -15,4 +16,4 @@ app.use(cors());
 router(app);
 
 
-app.listen(5567);
+app.listen(config.port);
