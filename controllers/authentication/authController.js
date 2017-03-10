@@ -1,6 +1,7 @@
 const User = require('./../../models/salep/User');
 const utility = require('./../other/utility.js');
 const jwt = require('express-jwt');
+const bcrypt = require('bcrypt');
 const config = require('./../../config.json');
 const isEmpty = utility.isEmpty;
 const respond = utility.respond;
@@ -13,7 +14,9 @@ exports.login = function (req, res, next) {
   if (isEmpty(username) || isEmpty(password))
     return utility.respondBadRequest(res);
 
-  User.findOne({'username': username}).exec((err, user) => {
+  User.findOne({
+    'username': username
+  }).exec((err, user) => {
     let detail = '';
     let success = false;
     let status = 200;
@@ -21,25 +24,35 @@ exports.login = function (req, res, next) {
     if (err) {
       detail = 'Internal DB error';
       status = 500;
-    }else if (!user || !user.validPassword(password)) {
+    } else if (!user) {
       detail = 'Login Failed';
       status = 401;
-    } else if(!user.activated){
-      detail = 'User Not Activated';
-      status = 401;
     } else {
-      detail = 'Login Successfull';
-      status = 200;
-      success = true;
-      data = user.generateJwt();
+      bcrypt.compare(password, user.hash, function (err, valid) {
+        if (!valid) {
+          detail = 'Login Failed';
+          status = 401;
+        } else if (!user.activated) {
+          detail = 'User Not Activated';
+          status = 401;
+        } else {
+          detail = 'Login Successfull';
+          status = 200;
+          success = true;
+          data = user.generateJwt();
+        }
+        return respond(res, status, success, detail, data, err);
+
+      });
     }
-    return respond(res, status, success, detail, data, err);
   });
 };
 
 exports.refresh = function (req, res, next) {
   console.log('Refresh Token Request Received');
-  let query = {_id: req.user._id};
+  let query = {
+    _id: req.user._id
+  };
 
   if (isEmpty(query._id) || isEmpty(password))
     return utility.respondBadRequest(res);
@@ -52,10 +65,10 @@ exports.refresh = function (req, res, next) {
     if (err) {
       detail = 'Internal DB error';
       status = 500;
-    }else if (!user) {
+    } else if (!user) {
       detail = 'Refresh Failed';
       status = 401;
-    } else if(!user.activated){
+    } else if (!user.activated) {
       detail = 'User Not Activated';
       status = 401;
     } else {

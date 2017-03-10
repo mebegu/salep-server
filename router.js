@@ -44,8 +44,8 @@ module.exports = function(app) {
 
   /*-------QUIZ RUSH ROUTES------------*/
   //Question
-  qrRoutes.post('/question/submit', cont,  question.submit);
-  qrRoutes.post('/question/edit/',  cont, question.edit);
+  qrRoutes.post('/question/submit',  question.submit);
+  qrRoutes.post('/question/edit',   cont, question.edit);
   qrRoutes.post('/question/remove', cont, question.remove);
   qrRoutes.post('/question/mark',   cont,  question.mark);
   qrRoutes.get('/question/:qid',    auth.auth, question.get);

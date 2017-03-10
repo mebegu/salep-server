@@ -14,11 +14,11 @@ exports.submit = function (req, res, next) {
     options: req.body.options,
     correctAnswer: correct,
     tags: req.body.tags,
-    author: req.user._id,
+    //author: req.user._id,
     status: 'pending'
   };
 
-  if (isEmpty(question) || isEmpty(options) ||
+  if (isEmpty(object.question) || isEmpty(object.options) ||
     object.options.length != 4 || object.correctAnswer < 0 || object.correctAnswer > 3)
     return utility.respondBadRequest(res);
 

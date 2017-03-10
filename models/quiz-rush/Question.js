@@ -9,8 +9,8 @@ const QuestionSchema = new Schema({
   tags:         [{type: String}],
   status:        {type: String, required: true},
   date:          {type: Date, default: Date.now},
-  correctAnswer: {type: Number, required: false, unique: true},
-  author:        {type: mongoose.SchemaTypes.ObjectId, ref: 'User'},
+  correctAnswer: {type: Number, required: true},
+  author:        {type: mongoose.SchemaTypes.ObjectId, ref: 'User'}
 });
 
 QuestionSchema.index({date: 1});
