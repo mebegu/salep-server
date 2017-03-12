@@ -14,7 +14,7 @@ exports.submit = function (req, res, next) {
     options: req.body.options,
     correctAnswer: correct,
     tags: req.body.tags,
-    //author: req.user._id,
+    author: req.user._id,
     status: 'pending'
   };
 
