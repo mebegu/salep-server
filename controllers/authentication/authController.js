@@ -41,7 +41,7 @@ exports.login = function (req, res, next) {
           data = user.generateJwt();
           isAdmin = user.admin;
           if(isAdmin){
-            status = 210
+            status = 208
           }else{
             status = 200
           }
