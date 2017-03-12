@@ -55,7 +55,7 @@ exports.list = function (req, res, next) {
 exports.mark = function (req, res, next) {
   console.log('Mark Question Request Recevied');
   query = {_id: req.body._id};
-  upt = {status: req.body.status};
+  upt = {set: {status: req.body.status}};
 
   if (isEmpty(query._id) || isEmpty(upt.status))
     return respondBadRequest(res);
@@ -71,12 +71,12 @@ exports.mark = function (req, res, next) {
 exports.edit = function (req, res, next) {
   console.log("Edit Question Request Recevied");
   let query = {_id: req.body._id};
-  let upt = {
+  let upt = {set: {
     name: req.body.name,
     surname: req.body.surname,
     email: req.body.email,
     photo: req.body.photo,
-    message: req.body.message
+    message: req.body.message}
   };
 
   if (isEmpty(query._id)|| isEmpty(email)) 

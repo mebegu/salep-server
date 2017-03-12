@@ -75,9 +75,7 @@ exports.activate = function (req, res, next) {
   query = {
     _id: req.body._id
   };
-  upt = {
-    activated: req.body.activated
-  };
+  upt = {set: {activated: req.body.activated}};
 
   if (!query._id || !upt.activated)
     return respondBadRequest(res);
@@ -95,12 +93,12 @@ exports.edit = function (req, res, next) {
   let query = {
     _id: req.body._id
   };
-  let upt = {
+  let upt = {set: {
     name: req.body.name,
     surname: req.body.surname,
     email: req.body.email,
     photo: req.body.photo,
-    message: req.body.message
+    message: req.body.message}
   };
 
   if (!query._id || !upt.email || upt.isEmpty())

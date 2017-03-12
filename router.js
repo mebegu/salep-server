@@ -26,7 +26,7 @@ module.exports = function(app) {
   qrRoutes.post('/question/edit',   admin, question.edit);
   qrRoutes.post('/question/remove', admin, question.remove);
   qrRoutes.post('/question/mark',   admin,  question.mark);
-  qrRoutes.get('/question/:qid',     auth.auth, question.get);
+  qrRoutes.get('/question/:qid',    auth.auth, question.get);
   qrRoutes.get('/question',         auth.auth, question.list);
 
   app.use('/qr', qrRoutes);
