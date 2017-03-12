@@ -14,7 +14,7 @@ module.exports = function(app) {
   salepRoutes.post('/user/apply', user.apply);
   salepRoutes.post('/user/edit',      admin, user.edit); // TODO owner check
   salepRoutes.post('/user/activate',  admin, user.activate);
-  salepRoutes.get('/user/:id',        auth.auth, user.get);
+  salepRoutes.get('/user/:uid',        auth.auth, user.get);
   salepRoutes.get('/user',            auth.auth, user.list);
 
   // Other
@@ -26,7 +26,7 @@ module.exports = function(app) {
   qrRoutes.post('/question/edit',   admin, question.edit);
   qrRoutes.post('/question/remove', admin, question.remove);
   qrRoutes.post('/question/mark',   admin,  question.mark);
-  qrRoutes.get('/question/:id',     auth.auth, question.get);
+  qrRoutes.get('/question/:qid',     auth.auth, question.get);
   qrRoutes.get('/question',         auth.auth, question.list);
 
   app.use('/qr', qrRoutes);
