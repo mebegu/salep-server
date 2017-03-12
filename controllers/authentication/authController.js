@@ -37,9 +37,14 @@ exports.login = function (req, res, next) {
           status = 401;
         } else {
           detail = 'Login Successfull';
-          status = 200;
           success = true;
           data = user.generateJwt();
+          isAdmin = user.admin;
+          if(isAdmin){
+            status = 210
+          }else{
+            status = 200
+          }
         }
         return respond(res, status, success, detail, data, err);
 
@@ -48,38 +53,6 @@ exports.login = function (req, res, next) {
   });
 };
 
-exports.refresh = function (req, res, next) {
-  console.log('Refresh Token Request Received');
-  let query = {
-    _id: req.user._id
-  };
-
-  if (isEmpty(query._id) || isEmpty(password))
-    return utility.respondBadRequest(res);
-
-  User.findById(query).exec((err, user) => {
-    let detail = '';
-    let success = false;
-    let status = 200;
-    let data = null;
-    if (err) {
-      detail = 'Internal DB error';
-      status = 500;
-    } else if (!user) {
-      detail = 'Refresh Failed';
-      status = 401;
-    } else if (!user.activated) {
-      detail = 'User Not Activated';
-      status = 401;
-    } else {
-      detail = 'Refresh Successfull';
-      status = 200;
-      success = true;
-      data = user.generateJwt();
-    }
-    return respond(res, status, success, detail, data, err);
-  });
-};
 
 exports.auth = jwt({
   secret: process.env.MY_TOKEN || config.JWTSecret,

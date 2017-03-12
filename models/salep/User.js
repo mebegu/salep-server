@@ -22,11 +22,9 @@ const UserSchema = new Schema({
 UserSchema.methods.generateJwt = function() {
   return jsonwebtoken.sign({
     _id:      this._id,
-    email:    this.email,
     username: this.username,
     activated:this.activated,
-    admin:    this.admin,
-    roles:    this.roles
+    admin:    this.admin
   }, (process.env.MY_TOKEN || config.JWTSecret), { expiresIn: config.JWTExpiration });
 };
 
