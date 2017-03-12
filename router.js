@@ -12,7 +12,8 @@ module.exports = function(app) {
   /*-------SALEP ROUTES------------*/
   // User
   salepRoutes.post('/user/apply', user.apply);
-  salepRoutes.post('/user/edit',      admin, user.edit); // TODO owner check
+  salepRoutes.post('/user/edit',      admin, user.edit);
+  salepRoutes.post('/user/remove',    admin, user.remove);
   salepRoutes.post('/user/activate',  admin, user.activate);
   salepRoutes.get('/user/:uid',        auth.auth, user.get);
   salepRoutes.get('/user',            auth.auth, user.list);

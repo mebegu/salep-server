@@ -37,14 +37,13 @@ exports.login = function (req, res, next) {
           status = 401;
         } else {
           detail = 'Login Successfull';
+          status = 200
           success = true;
-          data = user.generateJwt();
-          isAdmin = user.admin;
-          if(isAdmin){
-            status = 208
-          }else{
-            status = 200
-          }
+          data = {
+            token: user.generateJwt(),
+            _id: user._id,
+            admin: user.admin
+          };
         }
         return respond(res, status, success, detail, data, err);
 

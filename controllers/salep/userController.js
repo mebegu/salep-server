@@ -21,7 +21,7 @@ exports.apply = function (req, res, next) {
     message: req.body.message
   };
   let password = req.body.password;
-  if (!object.username || !object.email || !password)
+  if (isEmpty(object.username) || isEmpty(object.email) || isEmpty(password))
     return respondBadRequest(res);
 
   let rounds = parseInt(config.saltRounds);
@@ -42,7 +42,7 @@ exports.get = function (req, res, next) {
     _id: req.params.uid
   };
 
-  if (!query._id)
+  if (isEmpty(query._id))
     return respondBadRequest(res);
 
   User.findById(query, {
@@ -75,9 +75,13 @@ exports.activate = function (req, res, next) {
   query = {
     _id: req.body._id
   };
-  upt = {set: {activated: req.body.activated}};
+  upt = {
+    set: {
+      activated: req.body.activated
+    }
+  };
 
-  if (!query._id || !upt.activated)
+  if (isEmpty(query._id)|| isEmpty(upt.activated))
     return respondBadRequest(res);
 
   User.findByIdAndUpdate(query, upt, {
@@ -93,21 +97,37 @@ exports.edit = function (req, res, next) {
   let query = {
     _id: req.body._id
   };
-  let upt = {set: {
-    name: req.body.name,
-    surname: req.body.surname,
-    email: req.body.email,
-    photo: req.body.photo,
-    message: req.body.message}
+  let upt = {
+    set: {
+      name: req.body.name,
+      surname: req.body.surname,
+      email: req.body.email,
+      photo: req.body.photo,
+      message: req.body.message
+    }
   };
 
-  if (!query._id || !upt.email || upt.isEmpty())
+  if (isEmpty(query._id) || isEmpty(upt.email))
     return respondBadRequest(res);
 
   User.findByIdAndUpdate(query, upt, {
       new: true
     },
     function (err, data) {
-      return respondQuery(res, err, data._id, 'Question', 'Marked');
+      return respondQuery(res, err, data._id, 'User', 'Edited');
     });
+};
+
+exports.remove = function (req, res, next) {
+  console.log('Remove User request received');
+  query = {
+    _id: req.body._id
+  };
+
+  if (isEmpty(query._id))
+    return respondBadRequest(res);
+
+  Question.findByIdAndRemove(query, function (err, data) {
+    return respondQuery(res, err, data, 'Question', 'Remove');
+  });
 };

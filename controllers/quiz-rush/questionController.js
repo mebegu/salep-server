@@ -30,12 +30,14 @@ exports.submit = function (req, res, next) {
 
 exports.get = function (req, res, next) {
   console.log('Get-Question request received');
-  query = {_id: req.params.qid};
+  query = {
+    _id: req.params.qid
+  };
 
   if (isEmpty(query.id))
     return respondBadRequest(res);
 
-  Question.findById(query).populate("author", "username").exec( function (err, data) {
+  Question.findById(query).populate("author", "username").exec(function (err, data) {
     return respondQuery(res, err, data, 'Question', 'Found');
   });
 };
@@ -47,15 +49,26 @@ exports.list = function (req, res, next) {
   if (options.skip < 0 || options.limit > 30)
     return respondBadRequest(res);
 
-  Question.find(req.query, {question:1, status:1, author:1, date:1}, options).populate("author", "username").exec( function (err, data) {
+  Question.find(req.query, {
+    question: 1,
+    status: 1,
+    author: 1,
+    date: 1
+  }, options).populate("author", "username").exec(function (err, data) {
     return respondQuery(res, err, data, 'Questions', 'Found');
   });
 };
 
 exports.mark = function (req, res, next) {
   console.log('Mark Question Request Recevied');
-  query = {_id: req.body._id};
-  upt = {set: {status: req.body.status}};
+  query = {
+    _id: req.body._id
+  };
+  upt = {
+    set: {
+      status: req.body.status
+    }
+  };
 
   if (isEmpty(query._id) || isEmpty(upt.status))
     return respondBadRequest(res);
@@ -70,29 +83,37 @@ exports.mark = function (req, res, next) {
 
 exports.edit = function (req, res, next) {
   console.log("Edit Question Request Recevied");
-  let query = {_id: req.body._id};
-  let upt = {set: {
-    name: req.body.name,
-    surname: req.body.surname,
-    email: req.body.email,
-    photo: req.body.photo,
-    message: req.body.message}
+  let query = {
+    _id: req.body._id
+  };
+  let upt = {
+    set: {
+      question: req.body.question,
+      options: req.body.options,
+      correctAnswer: correct,
+      tags: req.body.tags
+    }
   };
 
-  if (isEmpty(query._id)|| isEmpty(email)) 
+  if (isEmpty(query._id) || isEmpty(object.question) || isEmpty(object.options) ||
+    object.options.length != 4 || object.correctAnswer < 0 || object.correctAnswer > 3)
     return respondBadRequest(res);
-  
-  Question.findByIdAndUpdate(query, upt, {new: true}, 
-  function (err, data) {
-    return respondQuery(res, err, data, 'Question', 'Edited');
-  });
+
+  Question.findByIdAndUpdate(query, upt, {
+      new: true
+    },
+    function (err, data) {
+      return respondQuery(res, err, data, 'Question', 'Edited');
+    });
 };
 
 exports.remove = function (req, res, next) {
   console.log('Remove Question request received');
-  query = {_id: req.params.qid};
+  query = {
+    _id: req.body._id
+  };
 
-  if (isEmpty(query.id))
+  if (isEmpty(query._id))
     return respondBadRequest(res);
 
   Question.findByIdAndRemove(query, function (err, data) {
