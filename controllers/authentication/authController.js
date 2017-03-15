@@ -29,6 +29,9 @@ exports.login = function (req, res, next) {
       detail = 'Login Failed';
       status = 401;
     } else {
+      if (status != 200)
+        return respond(res, status, success, detail, data, err);
+
       bcrypt.compare(password, user.hash, function (err, valid) {
         if (!valid) {
           detail = 'Login Failed';
@@ -50,7 +53,6 @@ exports.login = function (req, res, next) {
 
       });
     }
-    return respond(res, status, success, detail, data, err);
   });
 };
 
