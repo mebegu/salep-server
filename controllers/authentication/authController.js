@@ -55,6 +55,7 @@ exports.login = function (req, res, next) {
 
       });
     }
+    return respond(res, status, success, detail, data, err);
   });
 };
 
