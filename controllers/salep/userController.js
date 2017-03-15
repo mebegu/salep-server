@@ -127,7 +127,7 @@ exports.remove = function (req, res, next) {
   if (isEmpty(query._id))
     return respondBadRequest(res);
 
-  Question.findByIdAndRemove(query, function (err, data) {
+  User.findByIdAndRemove(query, function (err, data) {
     return respondQuery(res, err, data, 'Question', 'Remove');
   });
 };

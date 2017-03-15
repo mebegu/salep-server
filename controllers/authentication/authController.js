@@ -17,7 +17,6 @@ exports.login = function (req, res, next) {
   User.findOne({
     'username': username
   }).exec((err, user) => {
-    console.log(user)
     let detail = '';
     let success = false;
     let status = 200;
