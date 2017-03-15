@@ -14,9 +14,11 @@ exports.login = function (req, res, next) {
   if (isEmpty(username) || isEmpty(password))
     return utility.respondBadRequest(res);
 
+  console.log("finding");
   User.findOne({
     'username': username
   }).exec((err, user) => {
+    console.log(user)
     let detail = '';
     let success = false;
     let status = 200;
@@ -28,7 +30,9 @@ exports.login = function (req, res, next) {
       detail = 'Login Failed';
       status = 401;
     } else {
+      console.log("Comparing");
       bcrypt.compare(password, user.hash, function (err, valid) {
+        console.log("Compared")
         if (!valid) {
           detail = 'Login Failed';
           status = 401;
@@ -39,12 +43,14 @@ exports.login = function (req, res, next) {
           detail = 'Login Successfull';
           status = 200
           success = true;
+          console.log("creating data")
           data = {
             token: user.generateJwt(),
             _id: user._id,
             admin: user.admin
           };
         }
+        console.log("responding")
         return respond(res, status, success, detail, data, err);
 
       });
